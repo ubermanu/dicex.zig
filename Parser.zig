@@ -76,14 +76,12 @@ pub fn parse(self: *Parser, buffer: []const u8) !void {
                 if (try self.parseNumber()) |faces| {
                     try self.dice.append(.{ .sign = sign, .count = n, .die = .{ .faces = faces } });
                 } else {
-                    std.debug.print("Expected a number of faces\n", .{});
                     return error.UndefinedDieFaces;
                 }
             } else {
                 try self.modifiers.append(.{ .sign = sign, .value = n });
             }
         } else {
-            std.debug.print("Unexpected character \"{c}\" at {d}\n", .{ c, self.pos });
             return error.UnexpectedCharacter;
         }
     }
@@ -155,4 +153,22 @@ test "multiple mods" {
 
     try std.testing.expectEqual(0, p.dice.items.len);
     try std.testing.expectEqual(4, p.modifiers.items.len);
+}
+
+test "unexpected char" {
+    const allocator = std.testing.allocator;
+
+    var p = Parser.init(allocator);
+    defer p.deinit();
+
+    try std.testing.expectError(error.UnexpectedCharacter, p.parse("something"));
+}
+
+test "undefined die faces" {
+    const allocator = std.testing.allocator;
+
+    var p = Parser.init(allocator);
+    defer p.deinit();
+
+    try std.testing.expectError(error.UndefinedDieFaces, p.parse("1d"));
 }
