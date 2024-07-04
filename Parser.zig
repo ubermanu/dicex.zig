@@ -89,20 +89,6 @@ pub fn parse(self: *Parser, buffer: []const u8) !void {
     }
 }
 
-fn parseDice(self: *Parser) !Dice {
-    if (self.buffer[self.pos] != 'd') {
-        unreachable;
-    }
-
-    self.skipWhitespace(1);
-
-    if (try self.parseNumber()) |faces| {
-        return .{ .count = 1, .die = .{ .faces = faces } };
-    } else {
-        unreachable;
-    }
-}
-
 fn parseNumber(self: *Parser) !?usize {
     const start = self.pos;
 
