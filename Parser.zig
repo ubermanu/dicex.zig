@@ -72,18 +72,20 @@ pub fn parse(self: *Parser, buffer: []const u8) !void {
         }
 
         if (try self.parseNumber()) |n| {
-            if (self.matchChar('d')) {
-                if (try self.parseNumber()) |faces| {
-                    try self.dice.append(.{ .sign = sign, .count = n, .die = .{ .faces = faces } });
-                } else {
-                    return error.UndefinedDieFaces;
-                }
+            if (try self.parseDie()) |die| {
+                try self.dice.append(.{ .sign = sign, .count = n, .die = die });
             } else {
                 try self.modifiers.append(.{ .sign = sign, .value = n });
             }
-        } else {
-            return error.UnexpectedCharacter;
+            continue;
         }
+
+        if (try self.parseDie()) |die| {
+            try self.dice.append(.{ .sign = sign, .count = 1, .die = die });
+            continue;
+        }
+
+        return error.UnexpectedCharacter;
     }
 }
 
@@ -102,6 +104,18 @@ fn parseNumber(self: *Parser) !?usize {
     return try std.fmt.parseInt(usize, self.buffer[start..end], 10);
 }
 
+fn parseDie(self: *Parser) !?Die {
+    if (self.matchChar('d')) {
+        if (try self.parseNumber()) |faces| {
+            return .{ .faces = faces };
+        } else {
+            return error.UndefinedDieFaces;
+        }
+    } else {
+        return null;
+    }
+}
+
 fn matchChar(self: *Parser, c: u8) bool {
     if (self.peekChar(c)) {
         self.skipWhitespace(1);
@@ -117,6 +131,18 @@ fn peekChar(self: Parser, c: u8) bool {
 fn skipWhitespace(self: *Parser, len: usize) void {
     self.pos += len;
     while (self.pos < self.buffer.len and std.ascii.isWhitespace(self.buffer[self.pos])) : (self.pos += 1) {}
+}
+
+test "die without count" {
+    const allocator = std.testing.allocator;
+
+    var p = Parser.init(allocator);
+    defer p.deinit();
+
+    try p.parse("d20");
+
+    try std.testing.expectEqual(1, p.dice.items.len);
+    try std.testing.expectEqual(0, p.modifiers.items.len);
 }
 
 test "simple die" {
