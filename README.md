@@ -20,11 +20,11 @@ const Dicex = @import("dicex").Dicex;
 
 test {
     const allocator = std.testing.allocator;
-    var rand_impl = std.Random.DefaultPrng.init(0);
 
     const de = try Dicex.compile(allocator, "1d20 + 3");
     defer de.deinit();
 
+    var rand_impl = std.Random.DefaultPrng.init(0);
     const score = de.roll(rand_impl.random());
 
     try std.testing.expect(4 <= score and score <= 23);
