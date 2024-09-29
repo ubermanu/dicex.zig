@@ -1,8 +1,8 @@
 pub const Dicex = @import("Dicex.zig");
-pub const Die = @import("Die.zig");
 
-pub const Dice = @import("Parser.zig").Dice;
-pub const Modifier = @import("Parser.zig").Modifier;
+const Parser = @import("Parser.zig");
+pub const Dice = Parser.Dice;
+pub const Die = Parser.Die;
 
 pub const d2 = Die{ .faces = 2 };
 pub const d4 = Die{ .faces = 4 };

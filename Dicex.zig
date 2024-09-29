@@ -1,13 +1,12 @@
 const std = @import("std");
-const Die = @import("Die.zig");
 const Parser = @import("Parser.zig");
 
 const Dice = Parser.Dice;
-const Modifier = Parser.Modifier;
+const Die = Parser.Die;
 
 allocator: std.mem.Allocator,
 dices: []const Dice,
-modifiers: []const Modifier,
+modifiers: []const isize,
 
 const Dicex = @This();
 
@@ -20,7 +19,7 @@ pub fn compile(allocator: std.mem.Allocator, de: []const u8) !Dicex {
 
     return .{
         .allocator = allocator,
-        .dices = try parser.dice.toOwnedSlice(),
+        .dices = try parser.dices.toOwnedSlice(),
         .modifiers = try parser.modifiers.toOwnedSlice(),
     };
 }
@@ -39,7 +38,7 @@ pub fn roll(self: Dicex, rand: std.Random) isize {
     }
 
     for (self.modifiers) |mod| {
-        score += @as(isize, @intCast(mod.value)) * mod.sign;
+        score += mod;
     }
 
     return score;
