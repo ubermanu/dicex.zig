@@ -5,6 +5,9 @@ pub const Die = struct {
     faces: usize,
 
     pub fn roll(self: Die, rand: std.Random) usize {
+        if (self.faces == 0) {
+            return 0;
+        }
         return (rand.int(usize) % self.faces) + 1;
     }
 };
@@ -232,4 +235,13 @@ test "negative dice without number" {
 
     try std.testing.expectEqual(-1, p.dices.items[0].count);
     try std.testing.expectEqual(3, p.dices.items[0].die.faces);
+}
+
+test "die with 0 faces always rolls 0" {
+    var d = Die{ .faces = 0 };
+
+    var rand_impl = std.Random.DefaultPrng.init(0);
+    const score = d.roll(rand_impl.random());
+
+    try std.testing.expectEqual(0, score);
 }
