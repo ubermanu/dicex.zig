@@ -5,9 +5,8 @@
     .paths = .{
         "build.zig",
         "build.zig.zon",
-        "mod.zig",
-        "Dicex.zig",
-        "Die.zig",
-        "Parser.zig",
+        "src",
+        "README.md",
+        "LICENSE",
     },
 }
