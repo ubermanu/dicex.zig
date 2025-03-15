@@ -10,7 +10,7 @@ zig fetch --save git+https://github.com/ubermanu/dicex.zig
 
 ```zig
 const dicex_mod = b.dependency("dicex", .{});
-exe.root_module.addImport("dicex", dicex_mod.module("dicex"));
+exe.addImport("dicex", dicex_mod.module("dicex"));
 ```
 
 ## Usage
